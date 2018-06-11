@@ -21,12 +21,14 @@ static void SoundInit() {
 
 unsigned short freq = 4560;
 static void SetFreq( unsigned short newFreq ) {
+	freq = newFreq;
 	asm volatile(
-		"mov $4560, %%ax\n"			// Frequency
+		//"mov $4560, %%ax\n"			// Frequency
 		"out %%al, $0x42\n"			// write low to PIT counter 2's port
 		"mov %%ah, %%al\n"			// move ah to low
 		"out %%al, $0x42\n"			// write low (high) to same port
-		:
+		: /*out*/
+		: "ax"(newFreq)
 	);
 }
 
@@ -84,13 +86,20 @@ int main() {
 	print("Hello Worm!\n$");
 	//beep();
 	
+	unsigned char* pos = audio + 4;
+	
+	unsigned short length = *(short*)(audio+2);
+	
 	SoundInit();
-	SetFreq(0);
+	SetFreq(freq);
 	SoundOn();
-	for ( unsigned short idx2 = 0; idx2 < 20; ++idx2 ) {
-		for ( unsigned short idx = 0; idx < 60000; ++idx ) {
-			(void)idx;
+	for ( unsigned short idx2 = 0; idx2 < length; ++idx2 ) {
+		for ( unsigned short idx = 0; idx < 30000; ++idx ) {
+			if ( (*pos > 0) && (*pos < 128) ) {
+				SetFreq(100 * *pos);
+			}
 		}
+		pos++;
 	}
 	SoundOff();
 
