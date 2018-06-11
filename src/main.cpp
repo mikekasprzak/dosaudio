@@ -82,13 +82,15 @@ static void beep() {
 	);
 }
 
+#define PIT_FREQ 0x1234DD
+
 int main() {
 	print("Hello Worm!\n$");
 	//beep();
 	
 	unsigned char* pos = audio + 4;
-	
 	unsigned short length = *(short*)(audio+2);
+	
 	
 	SoundInit();
 	SetFreq(freq);

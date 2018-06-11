@@ -1,0 +1,3 @@
+[submodule "tools/noiseload"]
+	path = tools/noiseload
+	url = https://github.com/mikekasprzak/noiseload.git

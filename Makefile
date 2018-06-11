@@ -5,7 +5,7 @@ CC					:=	$(BIN_PREFIX)-gcc
 CXX					:=	$(BIN_PREFIX)-g++
 LD					:=	$(BIN_PREFIX)-ld
 
-OUT					:=	fun.com
+OUT					:=	dosaudio.com
 
 # -T ../sourceryg++-2016.11/ia16-elf/lib/dos-com.ld
 
