@@ -1,2 +1,4 @@
 *.exe
 *.com
+.output/
+src/gen/
