@@ -12,10 +12,35 @@ static void print( const char *string ) {
 }
 
 static void SoundInit() {
+	// Setup counter #2
 	asm volatile(
 		"mov $0b10110110, %%al\n"	// binary, square wave, 16bit (low then high), on counter #2
 		"out %%al, $0x43\n"			// PIT mode (counters) setup
 		:
+	);
+}
+
+static void SoundInterruptInit() {
+	unsigned short newFreq = 10;
+	
+	// Backup the interrupt pointer
+	
+	// Set the new pointer
+	
+	// Setup counter #0
+	asm volatile(
+		"mov $0b00110110, %%al\n"	// binary, square wave, 16bit (low then high), on counter #0
+		"out %%al, $0x43\n"			// PIT mode (counters) setup
+		: /*out*/
+	);
+	
+	// Set frequency
+	asm volatile(
+		"out %%al, $0x40\n"			// write low to PIT counter 2's port
+		"mov %%ah, %%al\n"			// move ah to low
+		"out %%al, $0x40\n"			// write low (high) to same port
+		: /*out*/
+		: "ax"(newFreq)
 	);
 }
 
@@ -113,6 +138,10 @@ unsigned char* songPos = songStart;
 unsigned short songLength = *(short*)(songData+2);
 unsigned char* songEnd = songStart + songLength;
 
+void song_Init() {
+	SoundInit();
+}
+
 void song_Step() {
 	// Update note
 	if ( (*songPos > 0) && (*songPos < 127) ) {
@@ -129,20 +158,15 @@ void song_Step() {
 		songPos = songStart;
 }
 
+void song_Exit() {
+	// Stop playback
+	SoundOff();
+}
 
 int main() {
 	print("Hello Worm!\n$");
-
-//	pitches[0] = 1;
-//	for ( unsigned short idx = 1; idx <= (sizeof(pitches)>>1); ++idx ) {
-//		pitches[idx] = PIT_FREQ /
-//	}
-
-
-	SoundInit();
-//	SetFreq(PIT_FREQ / 880);//freq);
-//	SoundOn();
-
+	
+	song_Init();
 
 	for ( unsigned short idx2 = 0; idx2 < songLength; ++idx2 ) {
 		// delay
@@ -152,7 +176,7 @@ int main() {
 		
 		song_Step();
 	}
-	SoundOff();
+	song_Exit();
 
 	return 0;
 }
