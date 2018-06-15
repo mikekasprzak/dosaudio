@@ -163,6 +163,31 @@ void song_Exit() {
 	SoundOff();
 }
 
+
+unsigned short MPUAddr = 0x330;
+#define MPUCommandPort		(MPUAddr+0)
+#define MPUDataPort			(MPUAddr+1)
+
+void midi_Init( unsigned short newMPUAddr = 0x330 ) {
+	MPUAddr = newMPUAddr;
+
+	asm volatile(
+		"mov $0x3F, %%al\n"		// 0x3f means 'enter UART mode'
+		"out %%al, %%dx\n"		// Write to the MPU-401 COMMAND port
+		: /* no output */
+		: "dx"(MPUCommandPort)
+	);
+}
+
+void midi_Write( unsigned char newData ) {
+    asm volatile(
+		"out %%al, %%dx\n"		// Write to the MPU-401 DATA port
+		: /* no output */
+		: "dx"(MPUDataPort), "al"(newData)
+	);	
+}
+
+
 int main() {
 	print("Hello Worm!\n$");
 	
@@ -177,6 +202,11 @@ int main() {
 		song_Step();
 	}
 	song_Exit();
+	
+	
+	midi_Init();
+	
+	
 
 	return 0;
 }
