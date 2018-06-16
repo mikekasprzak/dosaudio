@@ -22,18 +22,18 @@ static void SoundInit() {
 
 static void SoundInterruptInit() {
 	unsigned short newFreq = 10;
-	
+
 	// Backup the interrupt pointer
-	
+
 	// Set the new pointer
-	
+
 	// Setup counter #0
 	asm volatile(
 		"mov $0b00110110, %%al\n"	// binary, square wave, 16bit (low then high), on counter #0
 		"out %%al, $0x43\n"			// PIT mode (counters) setup
 		: /*out*/
 	);
-	
+
 	// Set frequency
 	asm volatile(
 		"out %%al, $0x40\n"			// write low to PIT counter 2's port
@@ -165,8 +165,8 @@ void song_Exit() {
 
 
 unsigned short MPUAddr = 0x330;
-#define MPUCommandPort		(MPUAddr+0)
-#define MPUDataPort			(MPUAddr+1)
+#define MPUDataPort			(MPUAddr+0)
+#define MPUCommandPort		(MPUAddr+1)
 
 void midi_Init( unsigned short newMPUAddr = 0x330 ) {
 	MPUAddr = newMPUAddr;
@@ -184,13 +184,13 @@ void midi_Write( unsigned char newData ) {
 		"out %%al, %%dx\n"		// Write to the MPU-401 DATA port
 		: /* no output */
 		: "dx"(MPUDataPort), "al"(newData)
-	);	
+	);
 }
 
 
 int main() {
 	print("Hello Worm!\n$");
-	
+
 	song_Init();
 
 	for ( unsigned short idx2 = 0; idx2 < songLength; ++idx2 ) {
@@ -198,15 +198,15 @@ int main() {
 		for ( unsigned short idx = 0; idx < 21000; ++idx ) {
 			(void)(idx);
 		}
-		
+
 		song_Step();
 	}
 	song_Exit();
-	
-	
+
+
 	midi_Init();
-	
-	
+
+
 
 	return 0;
 }
