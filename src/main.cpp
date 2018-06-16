@@ -168,6 +168,12 @@ unsigned short MPUAddr = 0x330;
 #define MPUDataPort			(MPUAddr+0)
 #define MPUCommandPort		(MPUAddr+1)
 
+// https://askubuntu.com/a/565566
+unsigned char midiSysexPanic[] = {
+	0xF0, 0x7E, 0x7F,
+	0x09, 0x01, 0xF7,
+};
+
 void midi_Init( unsigned short newMPUAddr = 0x330 ) {
 	MPUAddr = newMPUAddr;
 
