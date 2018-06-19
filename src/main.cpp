@@ -242,6 +242,11 @@ void midi_Write( unsigned char newData ) {
 	);
 }
 
+// how to open files? https://stackoverflow.com/questions/23810442/dos-assembly-program-reading-from-pipe
+
+// int 0x21, 0x3d // Open file?
+// int 0x21, 0x3f // Read file in to memory?
+// int 0x21, 0x3e // Close file?
 
 int main() {
 	print("Hello Worm!\n$");
