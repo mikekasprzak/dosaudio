@@ -11,6 +11,55 @@ static void print( const char *string ) {
                   : "ah");
 }
 
+static unsigned char scanwait() {
+	unsigned char ret;
+    asm volatile (
+		"mov $0x00, %%ah\n"
+        "int $0x16\n"
+        : /* no output */
+        : "ah"(ret)			// scan code
+    );
+    return ret;
+}
+
+static unsigned char keywait() {
+	unsigned char ret;
+    asm volatile (
+		"mov $0x00, %%ah\n"
+        "int $0x16\n"
+        : /* no output */
+        : "al"(ret)			// ascii code
+    );
+    return ret;
+}
+
+/// NOTE: zf (zero flag) tells you if there's a key or not
+/// NOTE: doesn't remove it from the queue
+static unsigned char scanget() {
+	unsigned char ret;
+    asm volatile (
+		"mov $0x01, %%ah\n"
+        "int $0x16\n"
+        : /* no output */
+        : "ah"(ret)			// scan code
+    );
+    return ret;
+}
+/// NOTE: doesn't remove it from the queue
+static unsigned char keyget() {
+	unsigned char ret;
+    asm volatile (
+		"mov $0x01, %%ah\n"
+        "int $0x16\n"
+        : /* no output */
+        : "al"(ret)			// ascii code
+    );
+    return ret;
+}
+
+
+
+
 static void SoundInit() {
 	// Setup counter #2
 	asm volatile(
@@ -212,7 +261,8 @@ int main() {
 
 	midi_Init();
 
-
+	print("Press a key to exit\n$");
+	keywait();
 
 	return 0;
 }
