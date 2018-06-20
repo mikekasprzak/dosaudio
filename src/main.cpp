@@ -71,19 +71,46 @@ static void SoundInit() {
 	);
 }
 
+static void IFunc() {
+	asm volatile(
+		"mov $0b10110110, %%al\n"	// binary, square wave, 16bit (low then high), on counter #2
+		"out %%al, $0x43\n"			// PIT mode (counters) setup
+		:
+	);
+	print(".$");
+}
+
 static void SoundInterruptInit() {
 	unsigned short newFreq = 10;
+	
+	void (*Func)() = &IFunc;
+	void* Addr = (void*)(0x1C<<2);
+	
+	Addr = (void*)Func;
 
-	// Backup the interrupt pointer
+//	// Backup the interrupt pointer
+//	asm volatile(
+//		"mov %%ax, %%dx;"
+//		: /*out*/
+//		: "dx"(Addr), "ax"(Func)
+//	);
 
 	// Set the new pointer
 
+	char fud[] = "..\n$";
+	fud[0] = 'A' + sizeof(Func);
+	print(fud);
+
+
+	
 	// Setup counter #0
 	asm volatile(
 		"mov $0b00110110, %%al\n"	// binary, square wave, 16bit (low then high), on counter #0
 		"out %%al, $0x43\n"			// PIT mode (counters) setup
 		: /*out*/
 	);
+	
+	return;
 
 	// Set frequency
 	asm volatile(
@@ -274,6 +301,7 @@ int main() {
 
 	print(ver);
 
+	SoundInterruptInit();
 
 	song_Init();
 
@@ -285,6 +313,9 @@ int main() {
 
 		song_Step();
 	}
+	
+	print("Press a key to exit\n$");
+	keywait();
 	song_Exit();
 
 
@@ -292,6 +323,7 @@ int main() {
 
 	print("Press a key to exit\n$");
 	keywait();
+	//midi_Exit();
 
 	return 0;
 }
