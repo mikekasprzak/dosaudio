@@ -214,8 +214,10 @@ void song_Exit() {
 
 
 unsigned short MPUAddr = 0x330;
-#define MPUDataPort			(MPUAddr+0)
-#define MPUCommandPort		(MPUAddr+1)
+#define MPU_DATA			(MPUAddr+0)
+#define MPU_COMMAND			(MPUAddr+1)
+#define MPU_STATUS			(MPUAddr+1)
+// The Command and Status ports are the same
 
 // https://askubuntu.com/a/565566
 unsigned char midiSysexPanic[] = {
@@ -230,7 +232,7 @@ void midi_Init( unsigned short newMPUAddr = 0x330 ) {
 		"mov $0x3F, %%al\n"		// 0x3f means 'enter UART mode'
 		"out %%al, %%dx\n"		// Write to the MPU-401 COMMAND port
 		: /* no output */
-		: "dx"(MPUCommandPort)
+		: "dx"(MPU_COMMAND)
 	);
 }
 
@@ -238,7 +240,7 @@ void midi_Write( unsigned char newData ) {
     asm volatile(
 		"out %%al, %%dx\n"		// Write to the MPU-401 DATA port
 		: /* no output */
-		: "dx"(MPUDataPort), "al"(newData)
+		: "dx"(MPU_DATA), "al"(newData)
 	);
 }
 
