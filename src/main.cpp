@@ -4,57 +4,59 @@ unsigned char audio[] = {
 };
 
 static void print( const char *string ) {
-    asm volatile ("mov   $0x09, %%ah\n"
-                  "int   $0x21\n"
-                  : /* no output */
-                  : "d"(string)
-                  : "ah");
+	asm volatile (
+		"mov $0x09, %%ah\n"
+		"int   $0x21\n"
+		: /* no output */
+		: "d"(string)
+		: "ah"
+	);
 }
 
 static unsigned char scanwait() {
 	unsigned char ret;
-    asm volatile (
+	asm volatile (
 		"mov $0x00, %%ah\n"
-        "int $0x16\n"
-        : /* no output */
-        : "ah"(ret)			// scan code
-    );
-    return ret;
+		"int $0x16\n"
+		: /* no output */
+		: "ah"(ret)			// scan code
+	);
+	return ret;
 }
 
 static unsigned char keywait() {
 	unsigned char ret;
-    asm volatile (
+	asm volatile (
 		"mov $0x00, %%ah\n"
-        "int $0x16\n"
-        : /* no output */
-        : "al"(ret)			// ascii code
-    );
-    return ret;
+		"int $0x16\n"
+		: /* no output */
+		: "al"(ret)			// ascii code
+	);
+	return ret;
 }
 
 /// NOTE: zf (zero flag) tells you if there's a key or not
 /// NOTE: doesn't remove it from the queue
 static unsigned char scanget() {
 	unsigned char ret;
-    asm volatile (
+	asm volatile (
 		"mov $0x01, %%ah\n"
-        "int $0x16\n"
-        : /* no output */
-        : "ah"(ret)			// scan code
-    );
-    return ret;
+		"int $0x16\n"
+		: /* no output */
+		: "ah"(ret)			// scan code
+	);
+	return ret;
 }
 /// NOTE: doesn't remove it from the queue
 static unsigned char keyget() {
 	unsigned char ret;
-    asm volatile (
+	asm volatile (
 		"mov $0x01, %%ah\n"
-        "int $0x16\n"
-        : /* no output */
-        : "al"(ret)			// ascii code
-    );
-    return ret;
+		"int $0x16\n"
+		: /* no output */
+		: "al"(ret)			// ascii code
+	);
+	return ret;
 }
 
 
@@ -237,7 +239,7 @@ void midi_Init( unsigned short newMPUAddr = 0x330 ) {
 }
 
 void midi_Write( unsigned char newData ) {
-    asm volatile(
+	asm volatile(
 		"out %%al, %%dx\n"		// Write to the MPU-401 DATA port
 		: /* no output */
 		: "dx"(MPU_DATA), "al"(newData)
@@ -252,6 +254,26 @@ void midi_Write( unsigned char newData ) {
 
 int main() {
 	print("Hello Worm!\n$");
+
+	char major, minor;
+	unsigned char os;
+
+	asm volatile(
+		"mov $0x30, %%ah;"
+		"int $0x21;"
+		: "=al"(major), "=ah"(minor), "=bh"(os)
+		:
+		: "bl", "cx"
+	);
+
+	char ver[] = "X.XX X\n$";
+	ver[0] = '0' + major;
+	ver[2] = '0' + (minor / 10);
+	ver[3] = '0' + (minor % 10);
+	ver[5] = 'D' + os;
+
+	print(ver);
+
 
 	song_Init();
 
